@@ -21,19 +21,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Product product, Long id) {
-
-        if(productRepository.findById(id).isPresent())
-        {
-            return productRepository.save(product);
-        }
-        return null;
+        return productRepository.findById(id)
+                .map(oldProduct -> {
+                    oldProduct.setName(product.getName());
+                    oldProduct.setDescription(product.getDescription());
+                    oldProduct.setPrice(product.getPrice());
+                   // oldProduct.setQuantity(product.getQuantity());
+                    return productRepository.save(oldProduct);
+                })
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
-
     @Override
     public void deleteProduct(Long productId) {
         if(productRepository.findById(productId).isPresent()) {
+
             productRepository.deleteById(productId);
         }
+
     }
 
     @Override
